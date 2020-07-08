@@ -36,10 +36,16 @@ class LSTM_Projection_Multi_Layer(nn.Module):
         self.num_layers = len(configs.keys()) - 1
         self.lstm_projection_multi_layer = nn.Sequential()
         for l in range(self.num_layers):
-            self.lstm_projection_multi_layer.add_module("LSTM_Projection{}".format(l),
-                                                        LSTM_Projection(configs[str(l)][0], configs[str(l)][1],
-                                                                        configs[str(l)][2], bidirectional=bidirectional,
-                                                                        dropout=dropout))
+            self.lstm_projection_multi_layer.add_module(
+                "LSTM_Projection{}".format(l),
+                LSTM_Projection(
+                    configs[str(l)][0],
+                    configs[str(l)][1],
+                    configs[str(l)][2],
+                    bidirectional=bidirectional,
+                    dropout=dropout
+                )
+            )
         self.FC = nn.Linear(configs["FC"][0], configs["FC"][1])
 
     def forward(self, x, nframes):
@@ -117,41 +123,86 @@ class TS_VAD_MC(nn.Module):
                                             padding=configs["average_pooling"] // 2)
         # Speaker Detection Block
         self.Conv2d_SD = nn.Sequential()
-        self.Conv2d_SD.add_module('CNN2D_BN_Relu_SD1',
-                                  CNN2D_BN_Relu(self.cnn_configs[0][0], self.cnn_configs[0][1], self.cnn_configs[0][2],
-                                                self.cnn_configs[0][3]))
-        self.Conv2d_SD.add_module('CNN2D_BN_Relu_SD2',
-                                  CNN2D_BN_Relu(self.cnn_configs[1][0], self.cnn_configs[1][1], self.cnn_configs[1][2],
-                                                self.cnn_configs[1][3]))
-        self.Conv2d_SD.add_module('CNN2D_BN_Relu_SD3',
-                                  CNN2D_BN_Relu(self.cnn_configs[2][0], self.cnn_configs[2][1], self.cnn_configs[2][2],
-                                                self.cnn_configs[2][3]))
-        self.Conv2d_SD.add_module('CNN2D_BN_Relu_SD4',
-                                  CNN2D_BN_Relu(self.cnn_configs[3][0], self.cnn_configs[3][1], self.cnn_configs[3][2],
-                                                self.cnn_configs[3][3]))
+        self.Conv2d_SD.add_module(
+            'CNN2D_BN_Relu_SD1',
+            CNN2D_BN_Relu(
+                self.cnn_configs[0][0],
+                self.cnn_configs[0][1],
+                self.cnn_configs[0][2],
+                self.cnn_configs[0][3]
+            )
+        )
+        self.Conv2d_SD.add_module(
+            'CNN2D_BN_Relu_SD2',
+            CNN2D_BN_Relu(
+                self.cnn_configs[1][0],
+                self.cnn_configs[1][1],
+                self.cnn_configs[1][2],
+                self.cnn_configs[1][3]
+            )
+        )
+        self.Conv2d_SD.add_module(
+            'CNN2D_BN_Relu_SD3',
+            CNN2D_BN_Relu(
+                self.cnn_configs[2][0],
+                self.cnn_configs[2][1],
+                self.cnn_configs[2][2],
+                self.cnn_configs[2][3]
+            )
+        )
+        self.Conv2d_SD.add_module(
+            'CNN2D_BN_Relu_SD4',
+            CNN2D_BN_Relu(
+                self.cnn_configs[3][0],
+                self.cnn_configs[3][1],
+                self.cnn_configs[3][2],
+                self.cnn_configs[3][3]
+            )
+        )
 
         self.splice_size = configs["splice_size"]
         self.Linear = nn.Linear(self.splice_size, self.Linear_dim)
         self.relu = nn.ReLU(True)
-        self.Shared_BLSTMP_1 = LSTM_Projection(input_size=self.Linear_dim, hidden_size=self.Shared_BLSTM_size,
-                                               linear_dim=self.Linear_Shared_layer1_dim, num_layers=1,
-                                               bidirectional=True, dropout=0)
-        self.Shared_BLSTMP_2 = LSTM_Projection(input_size=self.Linear_Shared_layer1_dim * 2,
-                                               hidden_size=self.Shared_BLSTM_size,
-                                               linear_dim=self.Linear_Shared_layer2_dim, num_layers=1,
-                                               bidirectional=True, dropout=0)
+        self.Shared_BLSTMP_1 = LSTM_Projection(
+            input_size=self.Linear_dim,
+            hidden_size=self.Shared_BLSTM_size,
+            linear_dim=self.Linear_Shared_layer1_dim,
+            num_layers=1,
+            bidirectional=True,
+            dropout=0
+        )
+        self.Shared_BLSTMP_2 = LSTM_Projection(
+            input_size=self.Linear_Shared_layer1_dim * 2,
+            hidden_size=self.Shared_BLSTM_size,
+            linear_dim=self.Linear_Shared_layer2_dim,
+            num_layers=1,
+            bidirectional=True,
+            dropout=0
+        )
         self.Conv1d_Attention = nn.Sequential()
         if self.Linear_Shared_layer2_dim * 2 != self.cnn_attention[0]:
             print("input dim doesn't match to input channel number")
             exit()
-        self.Conv1d_Attention.add_module('Conv1d_Attention',
-                                         SeparableConv1d(self.cnn_attention[0], self.cnn_attention[1],
-                                                         self.cnn_attention[2], self.cnn_attention[3]))
+        self.Conv1d_Attention.add_module(
+            'Conv1d_Attention',
+            SeparableConv1d(
+                self.cnn_attention[0],
+                self.cnn_attention[1],
+                self.cnn_attention[2],
+                self.cnn_attention[3]
+            )
+        )
         # self.Attention = SelfAttention(self.cnn_attention[1], self.attention_hidden_dim)
 
         self.conbine_speaker_size = self.cnn_attention[1] * 4
-        self.BLSTMP = LSTM_Projection(input_size=self.conbine_speaker_size, hidden_size=self.BLSTM_size,
-                                      linear_dim=self.BLSTM_Projection_dim, num_layers=1, bidirectional=True, dropout=0)
+        self.BLSTMP = LSTM_Projection(
+            input_size=self.conbine_speaker_size,
+            hidden_size=self.BLSTM_size,
+            linear_dim=self.BLSTM_Projection_dim,
+            num_layers=1,
+            bidirectional=True,
+            dropout=0
+        )
         self.FC = {}
         for i in range(self.output_speaker):
             self.FC[str(i)] = nn.Linear(self.BLSTM_Projection_dim * 2, self.output_size)
@@ -205,9 +256,9 @@ class TS_VAD_MC(nn.Module):
         1stBatch 2ndChannel 1stspeaker (Freq + Embedding) * Time1stBatch 2ndChannel 2ndspeaker (Freq + Embedding) * Time
         '''
         # **************Linear*************
-        # (Batch * Channel * speaker) * (Freq + Embedding) * Time -〉(Batch * Channel * speaker) *Time * Linear_dim
+        # (Batch * Channel * speaker) * (Freq + Embedding) * Time => (Batch * Channel * speaker) *Time * Linear_dim
         x_8 = self.relu(self.Linear(x_7.transpose(1, 2)))
-        # Shared_BLSTMP_1 (Batch * Channel * speaker) * Time * Linear_dim =〉(Batch * Channel *speaker) * Time * (Linear_Shared_layer1_dim * 2)
+        # Shared_BLSTMP_1 (Batch * Channel * speaker) * Time * Linear_dim => (Batch * Channel *speaker) * Time * (Linear_Shared_layer1_dim * 2)
         lens = [n for n in nframes for j in range(Channel) for i in range(speaker)]
         x_9 = self.Shared_BLSTMP_1(x_8, lens)
         # Shared_BLSTMP_2 (Batch * Channel * speaker) * Time * (Linear_Shared_layer1_dim * 2) =〉 (Batch * Channel * speaker) * Time * (Linear_Shared_layer1_dim * 2)
@@ -287,33 +338,72 @@ class TS_VAD_SC(nn.Module):
                                             padding=configs["average_pooling"] // 2)
         # Speaker Detection Block
         self.Conv2d_SD = nn.Sequential()
-        self.Conv2d_SD.add_module('CNN2D_BN_Relu_SD1',
-                                  CNN2D_BN_Relu(self.cnn_configs[0][0], self.cnn_configs[0][1], self.cnn_configs[0][2],
-                                                self.cnn_configs[0][3]))
-        self.Conv2d_SD.add_module('CNN2D_BN_Relu_SD2',
-                                  CNN2D_BN_Relu(self.cnn_configs[1][0], self.cnn_configs[1][1], self.cnn_configs[1][2],
-                                                self.cnn_configs[1][3]))
-        self.Conv2d_SD.add_module('CNN2D_BN_Relu_SD3',
-                                  CNN2D_BN_Relu(self.cnn_configs[2][0], self.cnn_configs[2][1], self.cnn_configs[2][2],
-                                                self.cnn_configs[2][3]))
-        self.Conv2d_SD.add_module('CNN2D_BN_Relu_SD4',
-                                  CNN2D_BN_Relu(self.cnn_configs[3][0], self.cnn_configs[3][1], self.cnn_configs[3][2],
-                                                self.cnn_configs[3][3]))
+        self.Conv2d_SD.add_module(
+            'CNN2D_BN_Relu_SD1',
+            CNN2D_BN_Relu(
+                self.cnn_configs[0][0],
+                self.cnn_configs[0][1],
+                self.cnn_configs[0][2],
+                self.cnn_configs[0][3]
+            )
+        )
+        self.Conv2d_SD.add_module(
+            'CNN2D_BN_Relu_SD2',
+            CNN2D_BN_Relu(
+                self.cnn_configs[1][0],
+                self.cnn_configs[1][1],
+                self.cnn_configs[1][2],
+                self.cnn_configs[1][3]
+            )
+        )
+        self.Conv2d_SD.add_module(
+            'CNN2D_BN_Relu_SD3',
+            CNN2D_BN_Relu(
+                self.cnn_configs[2][0],
+                self.cnn_configs[2][1],
+                self.cnn_configs[2][2],
+                self.cnn_configs[2][3]
+            )
+        )
+        self.Conv2d_SD.add_module(
+            'CNN2D_BN_Relu_SD4',
+            CNN2D_BN_Relu(
+                self.cnn_configs[3][0],
+                self.cnn_configs[3][1],
+                self.cnn_configs[3][2],
+                self.cnn_configs[3][3]
+            )
+        )
 
         self.splice_size = configs["splice_size"]
         self.Linear = nn.Linear(self.splice_size, self.Linear_dim)
         self.relu = nn.ReLU(True)
-        self.Shared_BLSTMP_1 = LSTM_Projection(input_size=self.Linear_dim, hidden_size=self.Shared_BLSTM_size,
-                                               linear_dim=self.Linear_Shared_layer1_dim, num_layers=1,
-                                               bidirectional=True, dropout=0)
-        self.Shared_BLSTMP_2 = LSTM_Projection(input_size=self.Linear_Shared_layer1_dim * 2,
-                                               hidden_size=self.Shared_BLSTM_size,
-                                               linear_dim=self.Linear_Shared_layer2_dim, num_layers=1,
-                                               bidirectional=True, dropout=0)
+        self.Shared_BLSTMP_1 = LSTM_Projection(
+            input_size=self.Linear_dim,
+            hidden_size=self.Shared_BLSTM_size,
+            linear_dim=self.Linear_Shared_layer1_dim,
+            num_layers=1,
+            bidirectional=True,
+            dropout=0
+        )
+        self.Shared_BLSTMP_2 = LSTM_Projection(
+            input_size=self.Linear_Shared_layer1_dim * 2,
+            hidden_size=self.Shared_BLSTM_size,
+            linear_dim=self.Linear_Shared_layer2_dim,
+            num_layers=1,
+            bidirectional=True,
+            dropout=0
+        )
 
         self.conbine_speaker_size = self.Linear_Shared_layer2_dim * 2 * self.output_speaker
-        self.BLSTMP = LSTM_Projection(input_size=self.conbine_speaker_size, hidden_size=self.BLSTM_size,
-                                      linear_dim=self.BLSTM_Projection_dim, num_layers=1, bidirectional=True, dropout=0)
+        self.BLSTMP = LSTM_Projection(
+            input_size=self.conbine_speaker_size,
+            hidden_size=self.BLSTM_size,
+            linear_dim=self.BLSTM_Projection_dim,
+            num_layers=1,
+            bidirectional=True,
+            dropout=0
+        )
         '''
         self.FC = {}
         for i in range(self.output_speaker):
