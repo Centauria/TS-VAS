@@ -16,9 +16,12 @@ def SoftCrossEntropy(inputs, target, reduction='mean'):
         loss = torch.sum(torch.mul(log_likelihood, target))
     return loss
 
+
 def SoftCrossEntropy_4Targets(ypreds, label_data):
-    loss = SoftCrossEntropy(ypreds[0], label_data[0]) + SoftCrossEntropy(ypreds[1], label_data[1]) + SoftCrossEntropy(ypreds[2], label_data[2]) + SoftCrossEntropy(ypreds[3], label_data[3])
+    loss = SoftCrossEntropy(ypreds[0], label_data[0]) + SoftCrossEntropy(ypreds[1], label_data[1]) + SoftCrossEntropy(
+        ypreds[2], label_data[2]) + SoftCrossEntropy(ypreds[3], label_data[3])
     return loss
+
 
 def CrossEntropy_SingleTargets(ypreds, label):
     criterion = torch.nn.CrossEntropyLoss()

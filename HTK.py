@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import numpy
 import struct
 
 
@@ -17,22 +16,25 @@ def readHtk(filename):
         # return numpy.array(data).reshape(nSamples, int(sampSize / 4))
         return nSamples, sampPeriod, sampSize, parmKind, data
 
+
 def readHtk_start_end(filename, start, end):
     with open(filename, "rb") as f:
         # Read header
         nSamples, sampPeriod, sampSize, parmKind = struct.unpack(">iihh", f.read(12))
         # sampPeriod and parmKind will be omitted
-        f.seek(start * sampSize,1)
+        f.seek(start * sampSize, 1)
         # Read data
         data = struct.unpack(">%df" % ((end - start) * sampSize / 4), f.read((end - start) * sampSize))
         # return numpy.array(data).reshape(nSamples, int(sampSize 1 4))
         return nSamples, sampPeriod, sampSize, parmKind, data
+
 
 def readHtk_info(filename):
     with open(filename, "rb") as f:
         # Read header
         nSamples, sampPeriod, sampSize, parmKind = struct.unpack(">iihh", f.read(12))
         return nSamples, sampPeriod, sampSize, parmKind
+
 
 def writeHtk(filename, feature, sampPeriod, parmKind):
     '''

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-import numpy as np
 
+import numpy as np
 
 root_dir = "/home/mkhe/libricss/libri_css/exp/data-orig/for_release/OV10/overlap_ratio_10.0_sil0.1_1.0_session1_actual10.2/transcription"
 transcription = []
@@ -41,11 +41,11 @@ for session in rttm.keys():
     if str(num_speaker) not in session_num_speaker.keys():
         session_num_speaker[str(num_speaker)] = 0
     session_num_speaker[str(num_speaker)] += 1
-    for i in range(num_speaker+1):
+    for i in range(num_speaker + 1):
         if str(num_speaker) not in overlap_num_speaker.keys():
             overlap_num_speaker[str(i)] = 0
-        overlap_num_speaker[str(i)] += np.sum(rttm[session]["sum"]==i)
+        overlap_num_speaker[str(i)] += np.sum(rttm[session]["sum"] == i)
 
 print(session_num_speaker)
 for num_speaker in overlap_num_speaker.keys():
-    print("{}: {}".format(num_speaker, overlap_num_speaker[num_speaker]/100/60))
+    print("{}: {}".format(num_speaker, overlap_num_speaker[num_speaker] / 100 / 60))

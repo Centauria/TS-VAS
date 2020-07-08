@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import torch
 import logging
 import sys
+
+import torch
 
 
 def save_checkpoint(model, optimizer, filename):
     torch.save({'model': model.state_dict(), 'optimizer': optimizer.state_dict()}, filename)
+
 
 def load_checkpoint(model, optimizer, filename):
     checkpoint = torch.load(filename)
@@ -15,13 +17,15 @@ def load_checkpoint(model, optimizer, filename):
     if optimizer is not None:
         optimizer.load_state_dict(checkpoint['optimizer'])
 
+
 def get_logger(filename):
     # Logging configuration: set the basic configuration of the logging system
-    log_formatter = logging.Formatter(fmt='%(asctime)s [%(processName)s, %(process)s] [%(levelname)-5.5s]  %(message)s', datefmt='%m-%d %H:%M')
+    log_formatter = logging.Formatter(fmt='%(asctime)s [%(processName)s, %(process)s] [%(levelname)-5.5s]  %(message)s',
+                                      datefmt='%m-%d %H:%M')
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
     # File logger
-    file_handler = logging.FileHandler("{}.log".format(filename)) 
+    file_handler = logging.FileHandler("{}.log".format(filename))
     file_handler.setFormatter(log_formatter)
     file_handler.setLevel(logging.DEBUG)
     logger.addHandler(file_handler)

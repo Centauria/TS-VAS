@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import os
+
 import numpy as np
 from tqdm import tqdm
 
-
 from reader import LibriSpeech_Force_Alignment_Label_Generate
+
 mixspec_json = "/home/mkhe/ts-vad/train_data/fbank/SimLibriCSS_train_subset_200h/mixspec.json"
 alignment_label_path = "/home/mkhe/ts-vad/train_data/train-force-alignment"
-label = LibriSpeech_Force_Alignment_Label_Generate(alignment_label_path, mixspec_json, wav_dir="/home/mkhe/178_home_mkhe/jsalt2020_simulate/simulate_data/data/SimLibriCSS-train/wav", differ_silence_inference_speech=True)
+label = LibriSpeech_Force_Alignment_Label_Generate(alignment_label_path, mixspec_json,
+                                                   wav_dir="/home/mkhe/178_home_mkhe/jsalt2020_simulate/simulate_data/data/SimLibriCSS-train/wav",
+                                                   differ_silence_inference_speech=True)
 feature_scp = "/home/mkhe/ts-vad/train_data/fbank/SimLibriCSS_train_subset_200h/SimLibriCSS_train_subset_200h_htk.list"
 output_dir = "train_data/label/SimLibriCSS_train_subset_200h"
 if not os.path.isdir(output_dir):
