@@ -9,23 +9,19 @@ def SoftCrossEntropy(inputs, target, reduction='mean'):
     target: Time * Num_class
     '''
     log_likelihood = -torch.nn.functional.log_softmax(inputs, dim=-1)
-    batch = inputs.shape[0]
+    batch_size = inputs.shape[0]
+    loss = torch.sum(torch.mul(log_likelihood, target))
     if reduction == 'mean':
-        loss = torch.sum(torch.mul(log_likelihood, target)) / batch
-    else:
-        loss = torch.sum(torch.mul(log_likelihood, target))
+        loss /= batch_size
     return loss
 
 
 def SoftCrossEntropy_4Targets(ypreds, label_data):
-    loss = SoftCrossEntropy(ypreds[0], label_data[0]) + SoftCrossEntropy(ypreds[1], label_data[1]) + SoftCrossEntropy(
-        ypreds[2], label_data[2]) + SoftCrossEntropy(ypreds[3], label_data[3])
+    loss = sum(map(lambda n: SoftCrossEntropy(ypreds[n], label_data[n]), range(4)))
     return loss
 
 
-def CrossEntropy_SingleTargets(ypreds, label):
+def CrossEntropy_SingleTargets(y_preds, label):
     criterion = torch.nn.CrossEntropyLoss()
-    loss = 0
-    for i in range(len(ypreds)):
-        loss += criterion(ypreds[i], label[i])
+    loss = sum(map(lambda n: criterion(y_preds[n], label[n]), range(len(y_preds))))
     return loss
