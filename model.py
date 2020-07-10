@@ -194,9 +194,9 @@ class TS_VAD_MC(nn.Module):
         )
         # self.Attention = SelfAttention(self.cnn_attention[1], self.attention_hidden_dim)
 
-        self.conbine_speaker_size = self.cnn_attention[1] * 4
+        self.combine_speaker_size = self.cnn_attention[1] * 4
         self.BLSTMP = LSTM_Projection(
-            input_size=self.conbine_speaker_size,
+            input_size=self.combine_speaker_size,
             hidden_size=self.BLSTM_size,
             linear_dim=self.BLSTM_Projection_dim,
             num_layers=1,
